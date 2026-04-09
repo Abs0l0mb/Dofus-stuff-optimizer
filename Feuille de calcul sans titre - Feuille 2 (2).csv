@@ -1,0 +1,41 @@
+,Stat,,,,Poids par point de stat
+,PA,,,,100
+,PM,,,,90
+,PO,,,,51
+,Invocation,,,,30
+,Dommage,,,,20
+,% Dommage armes,,,,15
+,% Dommage distance,,,,15
+,% Dommage melee,,,,15
+,% Dommage sort,,,,15
+,% Resistance distance,,,,15
+,% Resistance melee,,,,15
+,Soin,,,,10
+,% Critique,,,,10
+,Renvoi de dommage,,,,10
+,Retrait Pm,,,,7
+,Retrait Pa,,,,7
+,Esquive Pm,,,,7
+,Esquive Pa,,,,7
+,% Resistance (terre/eau/neutre/feu/air),,,,6
+,Dommage terre/eau/neutre/feu/air,,,,5
+,Dommage Critique (Do Cri),,,,5
+,Dommage de poussee (Do Pou),,,,5
+,Dommage piege,,,,5
+,Chasse,,,,5
+,Tacle,,,,4
+,Fuite,,,,4
+,Prospection,,,,3
+,Sagesse,,,,3
+,Puissance Piege (Pi Per),,,,2
+,Puissance (Pui),,,,2
+,Resistance fixe (terre/eau/neutre/feu/air),,,,2
+,Resistance Critique,,,,2
+,Resistance Poussee,,,,2
+,Force,,,,1
+,Intelligence,,,,1
+,Chance,,,,1
+,Agilite,,,,1
+,Pods,,,,0.25
+,Vitalie,,,,0.2
+,Initiative,,,,0.1

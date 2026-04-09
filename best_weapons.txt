@@ -1,0 +1,65 @@
+Fetched apCost for 743 weapons
+
+Rang  Nom                                           Type        Lv   PA        D�g�ts   Dmg/PA
+----------------------------------------------------------------------------------------------------
+   1  Pelle Gicque                                  Pelle       71    3        22-120     40.0
+   2  Arc H�type                                    Arc        184    4        79-144     36.0
+   3  Racine H�couanone                             B�ton      103    4        12-135    33.75
+   4  Marteau Ronto                                 Marteau    104    3         2-100    33.33
+   5  Baguette Rhon                                 Baguette   105    4         8-125    31.25
+   6  Balai rudimentaire                            Outil        1    3         51-80    26.67
+   7  Baguette de Mall�fisk                         Baguette   200    3         63-75     25.0
+   8  Baguette de Kouartz                           Baguette    78    2         22-50     25.0
+   9  Arc Hidsad                                    Arc         40    4         24-84     21.0
+  10  Marteau Poss�d�                               Marteau    200    4         60-72     18.0
+  11  Le Thanos                                     B�ton      172    4         43-68     17.0
+  12  Neuf Queues                                   �p�e        99    6          9-99     16.5
+  13  Az'tech                                       �p�e       186    4         42-65    16.25
+  14  Marteau de Katrepat                           Marteau    200    4         54-63    15.75
+  15  Marteau Phossile                              Marteau    200    4         52-62     15.5
+  16  Pelle de Katrepat                             Pelle      200    4         52-62     15.5
+  17  Arc de Fl�che Mauve                           Arc        107    3         33-46    15.33
+  18  Masse Ossiale                                 Marteau    199    4         44-61    15.25
+  19  B�thon                                        B�ton      200    4         50-60     15.0
+  20  �p�e Kari                                     �p�e       184    5         46-75     15.0
+  21  Hache du Chal�il                              Hache      200    4         48-60     15.0
+  22  Faux Maudite du Saigneur Guerrier             Faux       200    6         45-90     15.0
+  23  Sabres d'Atcham                               �p�e       200    5         59-74     14.8
+  24  Potence d'Ephedrya                            Hache      200    5         67-74     14.8
+  25  Dagues Hischantes                             Dague       80    3         26-44    14.67
+  26  Claymomore                                    �p�e       200    6         72-88    14.67
+  27  Pelle Em�laka                                 Pelle      191    3         31-44    14.67
+  28  Lame givr�e du Chevalier de Glace             �p�e       200    4         48-58     14.5
+  29  Pelle Vice                                    Pelle      199    5         52-72     14.4
+  30  Pelle Hikule                                  Pelle      121    3         24-43    14.33
+  31  Marteau des Anciens Steamers                  Marteau    197    4         47-57    14.25
+  32  Hache Harn�e                                  Hache      158    4         39-57    14.25
+  33  �p�e Lopon�ze                                 �p�e       184    4         42-56     14.0
+  34  Kukri Kura                                    �p�e       179    3         20-42     14.0
+  35  Fuschia                                       �p�e       163    4         32-56     14.0
+  36  Marteau d'Henual                              Marteau    193    4         36-56     14.0
+  37  Spatule Tranche-Gourmands                     Pelle      200    5         53-70     14.0
+  38  Pelle de la Cour Sombre                       Pelle      200    5         61-70     14.0
+  39  �p�e de la Reine des Voleurs                  �p�e       200    5         55-69     13.8
+  40  B�che de Corruption                           Pelle      200    5         59-69     13.8
+  41  Rapi�re du Rat Blanc                          �p�e       109    4         31-55    13.75
+  42  Masse Clochecuivre                            Marteau    196    4         46-55    13.75
+  43  H�qache                                       Hache      200    4         40-55    13.75
+  44  Faux N�me                                     Faux       200    4         49-55    13.75
+  45  Pyraguette                                    Baguette   200    4         45-54     13.5
+  46  Rapi�re aux Glyphes                           �p�e       197    4         41-54     13.5
+  47  Kornzbz Chzazzzbz                             Marteau    195    4         49-54     13.5
+  48  Baguette du Ch�ne Mou                         Baguette   171    3          2-40    13.33
+  49  �p�e Toche                                    �p�e       196    5         37-66     13.2
+  50  Griffe de Gargandyas                          �p�e       200    7         77-91     13.0
+  51  Crocobur                                      �p�e       200    6         53-78     13.0
+  52  Pelle de Nidas                                Pelle      200    4         41-52     13.0
+  53  Pelle V�tik                                   Pelle      181    5         42-65     13.0
+  54  Faux Chaotique                                Faux       200    5         53-65     13.0
+  55  �p�e Maudite du Saigneur Guerrier             �p�e       200    7         45-90    12.86
+  56  Marteau Reine                                 Marteau    187    5         36-64     12.8
+  57  Hache Euvale                                  Hache      200    5         48-64     12.8
+  58  �p�e du Granduk                               �p�e       200    4         39-51    12.75
+  59  Corbalame                                     �p�e       110    4         37-51    12.75
+  60  Masse du Corailleur Magistral                 Marteau    125    4         23-51    12.75
+[rerun: b8]

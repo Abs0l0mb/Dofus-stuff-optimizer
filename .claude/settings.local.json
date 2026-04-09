@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:api.dofusdb.fr)",
+      "Bash(python -c ':*)"
+    ]
+  }
+}

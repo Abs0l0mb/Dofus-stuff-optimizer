@@ -1,0 +1,91 @@
+{
+  "stat_weights": {
+    "Agilité": 0,
+    "Air": 0,
+    "Air (%)": 0,
+    "Air (fixe)": 0,
+    "Armes (%)": 0,
+    "Chance": 0,
+    "Critiques": 0,
+    "Critiques (fixe)": 0,
+    "Distance (%)": 0,
+    "Dommages": 5,
+    "Dommages Pièges": 0,
+    "Eau": 0,
+    "Eau (%)": 0,
+    "Eau (fixe)": 0,
+    "Esquive PA": 0,
+    "Esquive PM": 0,
+    "Feu": 0,
+    "Feu (%)": 0,
+    "Feu (fixe)": 0,
+    "Force": 2,
+    "Fuite": 0,
+    "Initiative": 0,
+    "Intelligence": 0,
+    "Invocation": 0,
+    "Mêlée (%)": 0,
+    "Neutre": 0,
+    "Neutre (%)": 0,
+    "Neutre (fixe)": 0,
+    "PA": 100,
+    "PM": 90,
+    "Pods": 0,
+    "Portée": 20,
+    "Poussée": 0,
+    "Prospection": 0,
+    "Puissance": 2,
+    "Renvoi": 0,
+    "Retrait PA": 0,
+    "Retrait PM": 0,
+    "Sagesse": 0,
+    "Soins": 0,
+    "Sorts (%)": 0,
+    "Tacle": 0,
+    "Terre": 5,
+    "Terre (%)": 0,
+    "Terre (fixe)": 0,
+    "Vitalité": 0.2
+  },
+  "min_stats": {
+    "PA": 5,
+    "PM": 2
+  },
+  "stat_caps": {
+    "PA": 5,
+    "PM": 3,
+    "Portée": 6
+  },
+  "excluded_items": [
+    "Annobusé de Maître Jarbo",
+    "Surpuissant Chacha de Combat (MJ)",
+    "Petit Chacha de Combat (MJ)",
+    "Amulette de Jiva",
+    "Dofus Vulbis",
+    "Dofus Ocre",
+    "Dolmanax",
+    "Bouclier de Bowisse Ankarton",
+    "Cape Fulgurante Ankarton",
+    "Ceinture du Meulou Ankarton",
+    "Collier Debruk'Sayl",
+    "Anneau Debruk'Sayl",
+    "Goultard Ankarton",
+    "Lorsotheuses",
+    "Bandeau de Spiritueur",
+    "La Broche Céleste Ankarton",
+    "Geta Ankarton",
+    "Coiffe du Bouftou Ankarton",
+    "Robuste majeur"
+  ],
+  "locked_items": [],
+  "min_stat_sums": [
+    {
+      "stats": [
+        "Force",
+        "Puissance"
+      ],
+      "min": 1250
+    }
+  ],
+  "_comment": "stat_weights keys must match the French characteristic names returned by the API (/characteristics endpoint). For grouped stats in the CSV (e.g. all elements), each element gets its own entry with the same weight."
+}

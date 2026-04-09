@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dofus Stuff Optimizer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      font-size: 14px;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #16213e;
+      border-bottom: 2px solid #e8b84b;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    header h1 { font-size: 20px; color: #e8b84b; }
+    #status-badge {
+      margin-left: auto;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: #0f3460;
+      color: #aaa;
+    }
+    #status-badge.loaded { background: #1a4731; color: #4caf50; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 0;
+      height: calc(100vh - 53px);
+    }
+
+    /* ---- Sidebar ---- */
+    .sidebar {
+      background: #16213e;
+      border-right: 1px solid #2a2a4a;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: #0f3460;
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .card h3 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #e8b84b;
+      margin-bottom: 12px;
+    }
+
+    label { display: block; font-size: 12px; color: #aaa; margin-bottom: 4px; }
+
+    input[type=number], input[type=text] {
+      width: 100%;
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 4px;
+      color: #e0e0e0;
+      padding: 6px 8px;
+      font-size: 13px;
+    }
+    input[type=number]:focus, input[type=text]:focus {
+      outline: none;
+      border-color: #e8b84b;
+    }
+
+    /* weights table */
+    .weights-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .weights-table th {
+      text-align: left;
+      font-size: 11px;
+      color: #888;
+      padding: 0 4px 6px;
+    }
+    .weights-table td { padding: 2px 4px; }
+    .weights-table td:first-child { color: #ccc; font-size: 12px; width: 60%; }
+    .weights-table input[type=number] { padding: 3px 6px; font-size: 12px; }
+
+    /* kv pairs (min_stats, stat_caps, excluded) */
+    .kv-list { display: flex; flex-direction: column; gap: 6px; }
+    .kv-row { display: flex; gap: 6px; align-items: center; }
+    .kv-row input { flex: 1; }
+    .kv-row input:first-child { flex: 1.5; }
+    .btn-icon {
+      background: none;
+      border: 1px solid #444;
+      border-radius: 4px;
+      color: #888;
+      cursor: pointer;
+      padding: 4px 7px;
+      font-size: 13px;
+      line-height: 1;
+    }
+    .btn-icon:hover { color: #e8b84b; border-color: #e8b84b; }
+
+    .btn-add {
+      margin-top: 8px;
+      background: none;
+      border: 1px dashed #444;
+      border-radius: 4px;
+      color: #888;
+      cursor: pointer;
+      padding: 5px;
+      font-size: 12px;
+      width: 100%;
+    }
+    .btn-add:hover { color: #e8b84b; border-color: #e8b84b; }
+
+    /* action buttons */
+    .btn {
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 9px 16px;
+      width: 100%;
+      transition: opacity .15s;
+    }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-primary { background: #e8b84b; color: #1a1a2e; }
+    .btn-primary:hover:not(:disabled) { opacity: .85; }
+    .btn-secondary { background: #0f3460; color: #e0e0e0; border: 1px solid #2a2a4a; }
+    .btn-secondary:hover:not(:disabled) { border-color: #e8b84b; color: #e8b84b; }
+
+    .btn-row { display: flex; gap: 8px; }
+    .btn-row .btn { flex: 1; }
+
+    /* ---- Main panel ---- */
+    .main {
+      overflow-y: auto;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 10px;
+      color: #444;
+    }
+    .placeholder svg { width: 64px; height: 64px; opacity: .3; }
+
+    /* results */
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead th {
+      text-align: left;
+      padding: 6px 10px;
+      background: #0f3460;
+      color: #e8b84b;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    tbody tr { border-bottom: 1px solid #1e1e3a; }
+    tbody tr:hover { background: #1e1e3a; }
+    tbody td { padding: 7px 10px; }
+    td.slot { color: #888; font-size: 11px; text-transform: uppercase; width: 90px; }
+    td.level { color: #888; text-align: right; width: 40px; }
+    td.name { color: #e0e0e0; font-weight: 500; }
+    td.effects { color: #aaa; font-size: 12px; }
+    td.stat-name { color: #ccc; }
+    td.stat-val { text-align: right; color: #e8b84b; font-weight: 600; width: 60px; }
+
+    .set-bonus-card {
+      background: #0f3460;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 12px;
+    }
+    .set-bonus-card strong { color: #e8b84b; }
+    .set-bonus-card span { color: #aaa; margin-left: 6px; }
+
+    .score-bar {
+      background: #0f3460;
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .score-bar .label { color: #888; font-size: 12px; }
+    .score-bar .value { font-size: 22px; font-weight: 700; color: #e8b84b; margin-left: auto; }
+
+    /* spinner */
+    .spinner {
+      display: none;
+      width: 18px; height: 18px;
+      border: 2px solid #888;
+      border-top-color: #e8b84b;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-box {
+      background: #3a1a1a;
+      border: 1px solid #c62828;
+      border-radius: 6px;
+      padding: 12px 16px;
+      color: #ef9a9a;
+      font-size: 13px;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #aaa;
+      cursor: pointer;
+    }
+    .checkbox-row input { width: auto; cursor: pointer; }
+
+    /* modal */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.7);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #16213e;
+      border: 1px solid #2a2a4a;
+      border-radius: 10px;
+      padding: 24px;
+      width: 620px;
+      max-width: 95vw;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .modal h2 { color: #e8b84b; font-size: 16px; }
+    .modal p  { color: #aaa; font-size: 13px; line-height: 1.5; }
+    .modal ol { color: #aaa; font-size: 13px; line-height: 2; padding-left: 18px; }
+    .modal ol b { color: #e0e0e0; }
+    .snippet-box {
+      background: #0a0a1a;
+      border: 1px solid #2a2a4a;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-family: monospace;
+      font-size: 11px;
+      color: #7ec8e3;
+      word-break: break-all;
+      max-height: 100px;
+      overflow-y: auto;
+      user-select: all;
+    }
+    .modal-footer { display: flex; gap: 8px; justify-content: flex-end; }
+    .btn-copy { background: #e8b84b; color: #1a1a2e; border: none; border-radius: 6px;
+                padding: 8px 18px; font-weight: 600; cursor: pointer; font-size: 13px; }
+    .btn-copy:hover { opacity: .85; }
+    .btn-close { background: none; border: 1px solid #444; border-radius: 6px;
+                 color: #aaa; padding: 8px 18px; cursor: pointer; font-size: 13px; }
+    .btn-close:hover { border-color: #e8b84b; color: #e8b84b; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>⚔ Dofus Stuff Optimizer</h1>
+  <span id="status-badge">items.json: chargement…</span>
+</header>
+
+<div class="layout">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+
+    <!-- Level -->
+    <div class="card">
+      <h3>Paramètres</h3>
+      <label>Niveau maximum</label>
+      <input type="number" id="level" value="200" min="1" max="200">
+      <br>
+      <label class="checkbox-row" style="margin-top:10px">
+        <input type="checkbox" id="use-avg">
+        Utiliser la moyenne des effets (min+max)/2
+      </label>
+    </div>
+
+    <!-- Stat weights -->
+    <div class="card">
+      <h3>Poids des stats</h3>
+      <table class="weights-table">
+        <thead><tr><th>Stat</th><th>Poids/pt</th></tr></thead>
+        <tbody id="weights-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Min stats -->
+    <div class="card">
+      <h3>Stats minimales</h3>
+      <div class="kv-list" id="min-stats-list"></div>
+      <button class="btn-add" onclick="addKvRow('min-stats-list', '', '')">+ Ajouter</button>
+    </div>
+
+    <!-- Stat caps -->
+    <div class="card">
+      <h3>Caps de stats</h3>
+      <div class="kv-list" id="stat-caps-list"></div>
+      <button class="btn-add" onclick="addKvRow('stat-caps-list', '', '')">+ Ajouter</button>
+    </div>
+
+    <!-- Min stat sums -->
+    <div class="card">
+      <h3>Minimums sur somme de stats</h3>
+      <div class="kv-list" id="min-stat-sums-list"></div>
+      <button class="btn-add" onclick="addStatSumRow([], '')">+ Ajouter</button>
+    </div>
+
+    <!-- Excluded -->
+    <div class="card">
+      <h3>Items exclus</h3>
+      <div class="kv-list" id="excluded-list"></div>
+      <button class="btn-add" onclick="addExcludedRow('')">+ Ajouter</button>
+    </div>
+
+    <!-- Locked items -->
+    <div class="card">
+      <h3>Items verrouillés</h3>
+      <div class="kv-list" id="locked-list"></div>
+      <button class="btn-add" onclick="addLockedRow('')">+ Ajouter</button>
+    </div>
+
+    <!-- Actions -->
+    <div class="card">
+      <h3>Actions</h3>
+      <div class="btn-row" style="margin-bottom:8px">
+        <button class="btn btn-secondary" onclick="saveConfig()">💾 Sauvegarder config</button>
+      </div>
+      <div class="btn-row" style="margin-bottom:8px">
+        <button class="btn btn-secondary" id="btn-fetch" onclick="fetchItems()">🔄 Fetch items</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-optimize" onclick="runOptimize()">▶ Optimiser</button>
+      </div>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn btn-primary" id="btn-open" onclick="openInDofusDB()" disabled
+                style="background:#4caf50">
+          ↗ Ouvrir dans DofusDB
+        </button>
+      </div>
+      <div class="btn-row" style="margin-top:6px">
+        <button class="btn btn-secondary" id="btn-export" onclick="exportToDofusDB()" disabled>
+          📋 Snippet console (fallback)
+        </button>
+      </div>
+      <div class="spinner" id="spinner" style="margin-top:12px"></div>
+    </div>
+
+  </aside>
+
+  <!-- ===== MAIN PANEL ===== -->
+  <main class="main" id="main-panel">
+    <div class="placeholder" id="placeholder">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+      <p>Configurez vos paramètres et cliquez sur <strong>Optimiser</strong></p>
+    </div>
+    <div id="error-area" style="display:none"></div>
+    <div id="result-area"></div>
+  </main>
+
+</div>
+
+<!-- Export modal -->
+<div class="modal-overlay" id="export-modal">
+  <div class="modal">
+    <h2>↗ Exporter vers DofusDB</h2>
+    <p>Copiez le snippet ci-dessous, puis collez-le dans la console DevTools
+       (<b>F12 → Console</b>) sur <b>dofusdb.fr</b> et appuyez sur Entrée.<br>
+       La page se rechargera automatiquement sur le créateur de stuff.</p>
+    <ol>
+      <li>Ouvrez <b>https://dofusdb.fr</b> dans votre navigateur</li>
+      <li>Appuyez sur <b>F12</b> puis allez dans l'onglet <b>Console</b></li>
+      <li>Collez le snippet et appuyez sur <b>Entrée</b></li>
+    </ol>
+    <div class="snippet-box" id="snippet-content"></div>
+    <div class="modal-footer">
+      <button class="btn-close" onclick="closeModal()">Fermer</button>
+      <button class="btn-copy" id="btn-copy-snippet" onclick="copySnippet()">
+        📋 Copier le snippet
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---------------------------------------------------------------------------
+// State
+// ---------------------------------------------------------------------------
+let cfg        = { stat_weights: {}, min_stats: {}, stat_caps: {}, excluded_items: [] };
+let lastResult = null;   // last optimize response, kept for export
+
+// ---------------------------------------------------------------------------
+// Init
+// ---------------------------------------------------------------------------
+async function init() {
+  await loadStatus();
+  await loadConfig();
+}
+
+async function loadStatus() {
+  const r = await fetch('/api/status');
+  const d = await r.json();
+  const badge = document.getElementById('status-badge');
+  if (d.items_loaded) {
+    badge.textContent = `${d.item_count.toLocaleString()} items chargés`;
+    badge.className = 'loaded';
+  } else {
+    badge.textContent = 'items.json manquant — cliquez Fetch';
+    badge.className = '';
+  }
+}
+
+async function loadConfig() {
+  const r = await fetch('/api/config');
+  cfg = await r.json();
+  renderWeights();
+  renderKvList('min-stats-list', cfg.min_stats || {});
+  renderKvList('stat-caps-list', cfg.stat_caps || {});
+  renderExcluded(cfg.excluded_items || []);
+  renderLocked(cfg.locked_items || []);
+  renderStatSums(cfg.min_stat_sums || []);
+}
+
+// ---------------------------------------------------------------------------
+// Weights table
+// ---------------------------------------------------------------------------
+function renderWeights() {
+  const tbody = document.getElementById('weights-body');
+  tbody.innerHTML = '';
+  for (const [stat, weight] of Object.entries(cfg.stat_weights || {})) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${stat}</td>
+      <td><input type="number" step="0.01" min="0" value="${weight}"
+           data-stat="${stat}" oninput="cfg.stat_weights[this.dataset.stat]=parseFloat(this.value)||0"></td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// KV lists (min_stats, stat_caps)
+// ---------------------------------------------------------------------------
+function renderKvList(containerId, obj) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  for (const [k, v] of Object.entries(obj)) {
+    appendKvRow(el, k, v);
+  }
+}
+
+function addKvRow(containerId, key, val) {
+  appendKvRow(document.getElementById(containerId), key, val);
+}
+
+function appendKvRow(container, key, val) {
+  const div = document.createElement('div');
+  div.className = 'kv-row';
+  div.innerHTML = `
+    <input type="text"   placeholder="Stat" value="${key}">
+    <input type="number" placeholder="Valeur" value="${val}" step="1" min="0">
+    <button class="btn-icon" onclick="this.parentElement.remove()">✕</button>`;
+  container.appendChild(div);
+}
+
+function readKvList(containerId) {
+  const obj = {};
+  document.querySelectorAll(`#${containerId} .kv-row`).forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const k = inputs[0].value.trim();
+    const v = parseFloat(inputs[1].value);
+    if (k && !isNaN(v)) obj[k] = v;
+  });
+  return obj;
+}
+
+// ---------------------------------------------------------------------------
+// Excluded items
+// ---------------------------------------------------------------------------
+function renderExcluded(list) {
+  const el = document.getElementById('excluded-list');
+  el.innerHTML = '';
+  list.forEach(name => appendExcludedRow(el, name));
+}
+
+function addExcludedRow(name) {
+  appendExcludedRow(document.getElementById('excluded-list'), name);
+}
+
+function appendExcludedRow(container, name) {
+  const div = document.createElement('div');
+  div.className = 'kv-row';
+  div.innerHTML = `
+    <input type="text" placeholder="Nom de l'item" value="${name}" style="flex:1">
+    <button class="btn-icon" onclick="this.parentElement.remove()">✕</button>`;
+  container.appendChild(div);
+}
+
+function readExcluded() {
+  return Array.from(document.querySelectorAll('#excluded-list .kv-row input'))
+    .map(i => i.value.trim()).filter(Boolean);
+}
+
+// ---------------------------------------------------------------------------
+// Locked items
+// ---------------------------------------------------------------------------
+function renderLocked(list) {
+  const el = document.getElementById('locked-list');
+  el.innerHTML = '';
+  (list || []).forEach(name => appendLockedRow(el, name));
+}
+
+function addLockedRow(name) {
+  appendLockedRow(document.getElementById('locked-list'), name);
+}
+
+function appendLockedRow(container, name) {
+  const div = document.createElement('div');
+  div.className = 'kv-row';
+  div.innerHTML = `
+    <input type="text" placeholder="Nom de l'item" value="${name}" style="flex:1">
+    <button class="btn-icon" onclick="this.parentElement.remove()">✕</button>`;
+  container.appendChild(div);
+}
+
+function readLocked() {
+  return Array.from(document.querySelectorAll('#locked-list .kv-row input'))
+    .map(i => i.value.trim()).filter(Boolean);
+}
+
+// ---------------------------------------------------------------------------
+// Min stat sums
+// ---------------------------------------------------------------------------
+function renderStatSums(list) {
+  const el = document.getElementById('min-stat-sums-list');
+  el.innerHTML = '';
+  (list || []).forEach(entry => appendStatSumRow(el, entry.stats, entry.min));
+}
+
+function addStatSumRow(stats, min) {
+  appendStatSumRow(document.getElementById('min-stat-sums-list'), stats, min);
+}
+
+function appendStatSumRow(container, stats, min) {
+  const div = document.createElement('div');
+  div.className = 'kv-row';
+  div.innerHTML = `
+    <input type="text"   placeholder="Stat1, Stat2, ..." value="${(stats || []).join(', ')}" style="flex:2">
+    <input type="number" placeholder="Min" value="${min || ''}" step="1" min="0" style="flex:1">
+    <button class="btn-icon" onclick="this.parentElement.remove()">✕</button>`;
+  container.appendChild(div);
+}
+
+function readStatSums() {
+  const result = [];
+  document.querySelectorAll('#min-stat-sums-list .kv-row').forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const stats = inputs[0].value.split(',').map(s => s.trim()).filter(Boolean);
+    const min   = parseFloat(inputs[1].value);
+    if (stats.length && !isNaN(min)) result.push({ stats, min });
+  });
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Config save
+// ---------------------------------------------------------------------------
+async function saveConfig() {
+  const payload = {
+    stat_weights:   cfg.stat_weights,
+    min_stats:      readKvList('min-stats-list'),
+    stat_caps:      readKvList('stat-caps-list'),
+    excluded_items: readExcluded(),
+    locked_items:   readLocked(),
+    min_stat_sums:  readStatSums(),
+  };
+  await fetch('/api/config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  cfg = { ...cfg, ...payload };
+  alert('Configuration sauvegardée ✓');
+}
+
+// ---------------------------------------------------------------------------
+// Fetch items
+// ---------------------------------------------------------------------------
+async function fetchItems() {
+  const btn = document.getElementById('btn-fetch');
+  const spinner = document.getElementById('spinner');
+  btn.disabled = true;
+  spinner.style.display = 'block';
+  try {
+    const r = await fetch('/api/fetch', { method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ level_min: 0, level_max: 200 }) });
+    const d = await r.json();
+    if (d.ok) {
+      await loadStatus();
+      alert(`${d.total} items récupérés ✓`);
+    } else {
+      showError(d.error);
+    }
+  } finally {
+    btn.disabled = false;
+    spinner.style.display = 'none';
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Optimize
+// ---------------------------------------------------------------------------
+async function runOptimize() {
+  const btn     = document.getElementById('btn-optimize');
+  const spinner = document.getElementById('spinner');
+  btn.disabled  = true;
+  spinner.style.display = 'block';
+  document.getElementById('placeholder').style.display = 'none';
+  document.getElementById('error-area').style.display = 'none';
+  document.getElementById('result-area').innerHTML = '';
+
+  const payload = {
+    level:          parseInt(document.getElementById('level').value),
+    use_avg:        document.getElementById('use-avg').checked,
+    stat_weights:   cfg.stat_weights,
+    min_stats:      readKvList('min-stats-list'),
+    stat_caps:      readKvList('stat-caps-list'),
+    excluded_items: readExcluded(),
+    locked_items:   readLocked(),
+    min_stat_sums:  readStatSums(),
+  };
+
+  try {
+    const r   = await fetch('/api/optimize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await r.json();
+    if (!r.ok || data.error) { showError(data.error || 'Erreur inconnue'); return; }
+    lastResult = { ...data, level: payload.level };
+    document.getElementById('btn-open').disabled   = false;
+    document.getElementById('btn-export').disabled = false;
+    renderResults(data, payload.stat_weights);
+  } catch (e) {
+    showError(e.message);
+  } finally {
+    btn.disabled = false;
+    spinner.style.display = 'none';
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Render results
+// ---------------------------------------------------------------------------
+function renderResults(data, weights) {
+  // Score bar
+  const scoreHtml = `
+    <div class="score-bar">
+      <span class="label">Score objectif</span>
+      <span class="value">${data.objective.toLocaleString('fr-FR', {maximumFractionDigits:1})}</span>
+    </div>`;
+
+  // Assign a color to each set that appears on 2+ equipped items
+  const SET_COLORS = [
+    '#e8b84b','#4caf50','#42a5f5','#ef5350','#ab47bc',
+    '#26c6da','#ff7043','#66bb6a','#5c6bc0','#ec407a',
+  ];
+  const setCount = {};
+  data.items.forEach(it => { if (it.set_id) setCount[it.set_id] = (setCount[it.set_id] || 0) + 1; });
+  const setColor = {};
+  let colorIdx = 0;
+  Object.keys(setCount).forEach(sid => {
+    if (setCount[sid] >= 2) setColor[sid] = SET_COLORS[colorIdx++ % SET_COLORS.length];
+  });
+
+  // Gear table
+  const gearRows = data.items.map(it => {
+    const fx = it.effects
+      .filter(e => weights[e.stat] && weights[e.stat] > 0)
+      .map(e => `${e.stat} <b>${effectVal(e)}</b>`)
+      .join(' &nbsp;·&nbsp; ');
+
+    const color  = it.set_id && setColor[it.set_id];
+    const badge  = color
+      ? `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;
+                      background:${color};margin-right:6px;flex-shrink:0"
+               title="${it.set_name}"></span>`
+      : `<span style="display:inline-block;width:8px;margin-right:6px"></span>`;
+    const nameStyle = color ? `style="color:${color}"` : '';
+
+    return `<tr ${color ? `style="border-left:2px solid ${color}"` : ''}>
+      <td class="slot">${it.slot}</td>
+      <td class="name"><span style="display:flex;align-items:center">${badge}<span ${nameStyle}>${it.name}</span></span></td>
+      <td class="level">Lv ${it.level}</td>
+      <td class="effects">${fx || '<span style="color:#555">—</span>'}</td>
+    </tr>`;
+  }).join('');
+
+  // Set legend (only for active sets with 2+ pieces)
+  const legendItems = Object.entries(setColor).map(([sid, color]) => {
+    const setName = data.items.find(it => it.set_id == sid)?.set_name || `Set ${sid}`;
+    const count   = setCount[sid];
+    return `<span style="display:inline-flex;align-items:center;gap:5px;margin-right:14px;font-size:12px">
+      <span style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0"></span>
+      <span style="color:#ccc">${setName} <span style="color:${color};font-weight:600">(${count} pièces)</span></span>
+    </span>`;
+  }).join('');
+  const legendHtml = legendItems
+    ? `<div style="padding:10px 14px;background:#0a0a1a;display:flex;flex-wrap:wrap;gap:6px">${legendItems}</div>`
+    : '';
+
+  const gearHtml = `
+    <div class="card" style="padding:0;overflow:hidden">
+      ${legendHtml}
+      <table>
+        <thead><tr><th>Slot</th><th>Item</th><th>Niveau</th><th>Effets (pondérés)</th></tr></thead>
+        <tbody>${gearRows}</tbody>
+      </table>
+    </div>`;
+
+  // Stats table — only show non-zero stats
+  const statRows = Object.entries(data.stats)
+    .filter(([, v]) => v !== 0)
+    .sort(([a], [b]) => (weights[b] || 0) - (weights[a] || 0))
+    .map(([stat, val]) => `<tr>
+      <td class="stat-name">${stat}</td>
+      <td class="stat-val">${Math.round(val)}</td>
+    </tr>`).join('');
+
+  const statsHtml = `
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead><tr><th>Stat</th><th style="text-align:right">Total</th></tr></thead>
+        <tbody>${statRows}</tbody>
+      </table>
+    </div>`;
+
+  // Set bonuses
+  let setBonusHtml = '';
+  if (data.set_bonuses && data.set_bonuses.length > 0) {
+    const cards = data.set_bonuses.map(sb => {
+      const bonuses = sb.bonuses.map(e => `${e.stat} +${effectVal(e)}`).join(', ');
+      return `<div class="set-bonus-card">
+        <strong>${sb.set}</strong> (${sb.pieces} pièces)<span>${bonuses}</span>
+      </div>`;
+    }).join('');
+    setBonusHtml = `
+      <div>
+        <h3 style="color:#e8b84b;font-size:13px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">
+          Bonus de panoplie actifs
+        </h3>
+        <div style="display:flex;flex-direction:column;gap:6px">${cards}</div>
+      </div>`;
+  }
+
+  document.getElementById('result-area').innerHTML = `
+    ${scoreHtml}
+    <div class="results-grid">
+      ${gearHtml}
+      ${statsHtml}
+    </div>
+    ${setBonusHtml}`;
+}
+
+function effectVal(e) {
+  return e.max !== 0 ? e.max : e.min;
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-area');
+  el.innerHTML = `<div class="error-box">❌ ${msg}</div>`;
+  el.style.display = 'block';
+}
+
+// ---------------------------------------------------------------------------
+// Open directly in DofusDB via Playwright
+// ---------------------------------------------------------------------------
+async function openInDofusDB() {
+  if (!lastResult) return;
+  const btn = document.getElementById('btn-open');
+  btn.disabled = true;
+  btn.textContent = '⏳ Ouverture…';
+
+  try {
+    const r = await fetch('/api/open-dofusdb', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: lastResult.items.map(it => ({ id: it.id, slot: it.slot, name: it.name })),
+        level: lastResult.level,
+      }),
+    });
+    const data = await r.json();
+    if (!r.ok || data.error) alert('Erreur: ' + (data.error || r.status));
+  } catch(e) {
+    alert('Erreur: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '↗ Ouvrir dans DofusDB';
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Export to DofusDB (snippet fallback)
+// ---------------------------------------------------------------------------
+async function exportToDofusDB() {
+  if (!lastResult) return;
+  const btn = document.getElementById('btn-export');
+  btn.disabled = true;
+  btn.textContent = '⏳ Génération…';
+
+  try {
+    const r = await fetch('/api/export-dofusdb', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: lastResult.items.map(it => ({ id: it.id, slot: it.slot, name: it.name })),
+        level: lastResult.level,
+      }),
+    });
+    const data = await r.json();
+    if (!r.ok || data.error) { alert('Erreur export: ' + (data.error || r.status)); return; }
+    document.getElementById('snippet-content').textContent = data.snippet;
+    document.getElementById('export-modal').classList.add('open');
+  } catch(e) {
+    alert('Erreur: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '↗ Exporter vers DofusDB';
+  }
+}
+
+function closeModal() {
+  document.getElementById('export-modal').classList.remove('open');
+}
+
+async function copySnippet() {
+  const text = document.getElementById('snippet-content').textContent;
+  await navigator.clipboard.writeText(text);
+  const btn = document.getElementById('btn-copy-snippet');
+  btn.textContent = '✓ Copié !';
+  setTimeout(() => btn.textContent = '📋 Copier le snippet', 2000);
+}
+
+// Close modal on overlay click
+document.getElementById('export-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ---------------------------------------------------------------------------
+init();
+</script>
+</body>
+</html>
